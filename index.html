@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FiveM Store - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-blue-400">FiveM Store</h1>
+          </div>
+
+          <!-- Center Navigation -->
+          <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+            <a href="products.html" class="hover:text-blue-400 transition"
+              >Products</a
+            >
+            <a href="categories.html" class="hover:text-blue-400 transition"
+              >Categories</a
+            >
+            <a href="about.html" class="hover:text-blue-400 transition"
+              >About</a
+            >
+          </div>
+
+          <!-- Right Section -->
+          <div class="flex items-center space-x-4">
+            <!-- Search -->
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-40 md:w-64"
+              />
+              <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+
+            <!-- Cart -->
+            <a
+              href="checkout.html"
+              class="relative p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-shopping-cart text-xl"></i>
+              <span
+                id="cartCount"
+                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hidden"
+                >0</span
+              >
+            </a>
+
+            <!-- Theme Toggle -->
+            <button
+              id="themeToggle"
+              onclick="toggleTheme()"
+              class="p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-moon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div
+          class="md:hidden flex justify-center space-x-6 py-3 border-t border-gray-700"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="products.html" class="hover:text-blue-400 transition"
+            >Products</a
+          >
+          <a href="categories.html" class="hover:text-blue-400 transition"
+            >Categories</a
+          >
+          <a href="about.html" class="hover:text-blue-400 transition">About</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Carousel -->
+    <section class="relative">
+      <div class="carousel relative overflow-hidden h-96">
+        <div class="carousel-inner flex transition-transform duration-500">
+          <div class="carousel-item w-full flex-shrink-0">
+            <div
+              class="h-96 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center"
+            >
+              <div class="text-center text-white">
+                <h2 class="text-4xl font-bold mb-4">Welcome to FiveM Store</h2>
+                <p class="text-xl">Premium scripts for your FiveM server</p>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-item w-full flex-shrink-0">
+            <div
+              class="h-96 bg-gradient-to-r from-green-600 to-blue-600 flex items-center justify-center"
+            >
+              <div class="text-center text-white">
+                <h2 class="text-4xl font-bold mb-4">New Releases</h2>
+                <p class="text-xl">Check out our latest products</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Category Filter -->
+      <div class="flex flex-wrap gap-4 mb-8 justify-center">
+        <button
+          class="category-filter px-4 py-2 bg-gray-700 rounded-lg hover:bg-blue-600 transition"
+          data-category="all"
+        >
+          All
+        </button>
+        <button
+          class="category-filter px-4 py-2 bg-gray-700 rounded-lg hover:bg-blue-600 transition"
+          data-category="ESX"
+        >
+          ESX
+        </button>
+        <button
+          class="category-filter px-4 py-2 bg-gray-700 rounded-lg hover:bg-blue-600 transition"
+          data-category="QB-Core"
+        >
+          QB-Core
+        </button>
+        <button
+          class="category-filter px-4 py-2 bg-gray-700 rounded-lg hover:bg-blue-600 transition"
+          data-category="QBox"
+        >
+          QBox
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="max-w-2xl mx-auto mb-8">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search products..."
+          class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+
+      <!-- Products Grid -->
+      <div
+        id="productsGrid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <!-- Products will be loaded here -->
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      // Load and display products
+      async function loadHomepageProducts() {
+        const data = await loadData();
+        const productsGrid = document.getElementById("productsGrid");
+        const searchInput = document.getElementById("searchInput");
+        const categoryFilters = document.querySelectorAll(".category-filter");
+
+        let filteredProducts = data.products;
+
+        function renderProducts() {
+          productsGrid.innerHTML = filteredProducts
+            .map(
+              (product) => `
+            <div class="product-card bg-gray-800 rounded-lg shadow-lg overflow-hidden fade-in">
+                <div class="h-48 bg-gray-700 flex items-center justify-center overflow-hidden">
+                    ${
+                      product.images && product.images.length > 0
+                        ? `<img src="${product.images[0]}" alt="${product.title}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                           <div class="w-full h-full flex items-center justify-center" style="display: none;">
+                             <i class="fas fa-box text-4xl text-gray-400"></i>
+                           </div>`
+                        : `<div class="w-full h-full flex items-center justify-center">
+                             <i class="fas fa-box text-4xl text-gray-400"></i>
+                           </div>`
+                    }
+                </div>
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold mb-2">${product.title}</h3>
+                    <p class="text-gray-400 mb-4">${
+                      product.shortDescription
+                    }</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-bold text-green-400">
+                            ${
+                              product.price === 0 ? "FREE" : `$${product.price}`
+                            }
+                        </span>
+                        <a href="product-detail.html?id=${product.id}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `
+            )
+            .join("");
+        }
+
+        // Search functionality
+        searchInput.addEventListener("input", (e) => {
+          filteredProducts = searchProducts(data.products, e.target.value);
+          renderProducts();
+        });
+
+        // Category filter functionality
+        categoryFilters.forEach((button) => {
+          button.addEventListener("click", () => {
+            const category = button.dataset.category;
+            filteredProducts = filterByCategory(data.products, category);
+            renderProducts();
+          });
+        });
+
+        // Initial render
+        renderProducts();
+      }
+
+      // Initialize carousel
+      function initCarousel() {
+        let currentSlide = 0;
+        const slides = document.querySelectorAll(".carousel-item");
+
+        function showSlide(index) {
+          const carouselInner = document.querySelector(".carousel-inner");
+          carouselInner.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        // Auto-advance slides
+        setInterval(() => {
+          currentSlide = (currentSlide + 1) % slides.length;
+          showSlide(currentSlide);
+        }, 5000);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadHomepageProducts();
+        initCarousel();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FiveM Store - About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation (same as index.html) -->
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-blue-400">FiveM Store</h1>
+          </div>
+          <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+            <a href="products.html" class="hover:text-blue-400 transition"
+              >Products</a
+            >
+            <a href="categories.html" class="hover:text-blue-400 transition"
+              >Categories</a
+            >
+            <a href="about.html" class="text-blue-400 font-semibold">About</a>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-40 md:w-64"
+              />
+              <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+            <a
+              href="checkout.html"
+              class="relative p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-shopping-cart text-xl"></i>
+              <span
+                id="cartCount"
+                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hidden"
+                >0</span
+              >
+            </a>
+            <button
+              id="themeToggle"
+              onclick="toggleTheme()"
+              class="p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-moon"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="md:hidden flex justify-center space-x-6 py-3 border-t border-gray-700"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="products.html" class="hover:text-blue-400 transition"
+            >Products</a
+          >
+          <a href="categories.html" class="hover:text-blue-400 transition"
+            >Categories</a
+          >
+          <a href="about.html" class="text-blue-400 font-semibold">About</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">About Us</h1>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- About Content -->
+        <div class="space-y-6">
+          <section>
+            <h2 class="text-2xl font-semibold mb-4">Our Story</h2>
+            <p class="text-gray-300 leading-relaxed">
+              FiveM Store is your premier destination for high-quality FiveM
+              scripts and resources. We're dedicated to providing the best
+              products and support for the FiveM community.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="text-2xl font-semibold mb-4">Our Mission</h2>
+            <p class="text-gray-300 leading-relaxed">
+              To empower FiveM server owners with reliable, well-coded scripts
+              that enhance gameplay experiences and streamline server
+              management.
+            </p>
+          </section>
+
+          <!-- Shop Information -->
+          <section>
+            <h2 class="text-2xl font-semibold mb-4">Shop Information</h2>
+            <div class="space-y-3">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-map-marker-alt text-blue-400"></i>
+                <span id="shopLocation" class="text-gray-300">Loading...</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-phone text-blue-400"></i>
+                <span id="shopPhone" class="text-gray-300">Loading...</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-envelope text-blue-400"></i>
+                <span id="shopEmail" class="text-gray-300">Loading...</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Team Members -->
+        <div>
+          <h2 class="text-2xl font-semibold mb-6">Our Team</h2>
+          <div id="teamMembers" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Team members will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      async function loadAboutPage() {
+        const data = await loadData();
+
+        // Load shop information
+        document.getElementById("shopLocation").textContent =
+          data.shopInfo.location;
+        document.getElementById("shopPhone").textContent = data.shopInfo.phone;
+        document.getElementById("shopEmail").textContent = data.shopInfo.email;
+
+        // Load team members
+        const teamContainer = document.getElementById("teamMembers");
+        teamContainer.innerHTML = data.team
+          .map(
+            (member) => `
+                <div class="bg-gray-800 rounded-lg p-6 text-center fade-in">
+                    <div class="w-20 h-20 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-2xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">${member.name}</h3>
+                    <p class="text-blue-400">${member.role}</p>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", loadAboutPage);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FiveM Store - Categories</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation (same as index.html) -->
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-blue-400">FiveM Store</h1>
+          </div>
+          <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+            <a href="products.html" class="hover:text-blue-400 transition"
+              >Products</a
+            >
+            <a href="categories.html" class="text-blue-400 font-semibold"
+              >Categories</a
+            >
+            <a href="about.html" class="hover:text-blue-400 transition"
+              >About</a
+            >
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-40 md:w-64"
+              />
+              <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+            <a
+              href="checkout.html"
+              class="relative p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-shopping-cart text-xl"></i>
+              <span
+                id="cartCount"
+                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hidden"
+                >0</span
+              >
+            </a>
+            <button
+              id="themeToggle"
+              onclick="toggleTheme()"
+              class="p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-moon"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="md:hidden flex justify-center space-x-6 py-3 border-t border-gray-700"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="products.html" class="hover:text-blue-400 transition"
+            >Products</a
+          >
+          <a href="categories.html" class="text-blue-400 font-semibold"
+            >Categories</a
+          >
+          <a href="about.html" class="hover:text-blue-400 transition">About</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">Categories</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Categories will be loaded here -->
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      async function loadCategories() {
+        const data = await loadData();
+        const categoriesContainer = document.querySelector("main .grid");
+
+        categoriesContainer.innerHTML = data.categories
+          .map(
+            (category) => `
+                <div class="category-card bg-gray-800 rounded-lg shadow-lg overflow-hidden fade-in hover:transform hover:scale-105 transition duration-300">
+                    <a href="products.html?category=${category}">
+                        <div class="h-48 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-folder text-6xl text-white opacity-80"></i>
+                        </div>
+                        <div class="p-6 text-center">
+                            <h3 class="text-2xl font-semibold mb-2">${category}</h3>
+                            <p class="text-gray-400">
+                                ${
+                                  data.products.filter((p) =>
+                                    p.categories.includes(category)
+                                  ).length
+                                } products
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", loadCategories);
+    </script>
+  </body>
+</html>

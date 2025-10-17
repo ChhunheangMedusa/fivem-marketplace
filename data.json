@@ -1,0 +1,91 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "title": "Advanced Hud System",
+      "description": "Modern aesthetics, extensive player customization options, and top-tier optimization - these are the essentials your server needs to stand out in the FiveM community. Our latest HUD script is a perfect blend of style, functionality, and performance, designed to enhance the gaming experience for both ESX and QBCore servers.",
+      "shortDescription": "",
+      "price": 0,
+      "images": ["assets/image/17mov_hud.jpg"],
+      "categories": ["QB-Core", "ESX"],
+      "fullDescription": "Modern aesthetics, extensive player customization options, and top-tier optimization - these are the essentials your server needs to stand out in the FiveM community. Our latest HUD script is a perfect blend of style, functionality, and performance, designed to enhance the gaming experience for both ESX and QBCore servers.",
+      "installation": "1. Download and extract  \n2. Add to resources folder \n3. ensure resource in server.cfg\n 4. Copy `qb-core/17mov_functions.lua` file from `installation` folder. \n5. Paste copied file to root directory of your `qb-core` resource. \n6. Open `qb-core/fxmanifest.lua` and add this line at bottom of manifest file  `client_script `17mov_functions.lua` ` \n7. Restart your server ",
+      "dependencies": ["QB-Core/ESX", "oxmysql/MySQL-Async"],
+      "downloadFile": "assets/downloads/17mov_Hud.zip"
+    },
+    {
+      "id": 2,
+      "title": "Pure Hud System",
+      "description": "",
+      "shortDescription": "",
+      "price": 0,
+      "images": ["assets/image/pure_hud.jpg"],
+      "categories": ["QB-Core", "ESX"],
+      "fullDescription": "This is modern aesthetic Pure Hud System.",
+      "installation": "1. Download and extract  \n2. Add to resources folder \n3. ensure resource in server.cfg ",
+      "dependencies": ["QB-Core/ESX", "oxmysql/MySQL-Async"],
+      "downloadFile": "assets/downloads/uz_PureHud.zip"
+    },
+    {
+      "id": 3,
+      "title": "Banking Hud System",
+      "description": "",
+      "shortDescription": "",
+      "price": 0,
+      "images": ["assets/image/banking_hud.jpg"],
+      "categories": ["QB-Core", "ESX"],
+      "fullDescription": "This is an Modern advance modern banking hud system which let player experience more.",
+      "installation": "1. Download and extract  \n2. Add to resources folder \n3. ensure resource in server.cfg\n4. Import the SQL file to create the required database tables\n5. Configure the script in `config.lua` ",
+      "dependencies": ["QB-Core/ESX", "oxmysql/MySQL-Async"],
+      "downloadFile": "assets/downloads/omes_banking.zip"
+    },
+    {
+      "id": 4,
+      "title": "Banking Hud System",
+      "description": "",
+      "shortDescription": "",
+      "price": 0,
+      "images": ["assets/image/qb_bank.jpg"],
+      "categories": ["QB-Core", "ESX"],
+      "fullDescription": "This is an Modern advance modern banking hud system which let player experience more.",
+      "installation": "1. Download and extract  \n2. Add to resources folder \n3. ensure resource in server.cfg\n4. Import the SQL file to create the required database tables",
+      "dependencies": ["QB-Core/ESX", "oxmysql/MySQL-Async"],
+      "downloadFile": "assets/downloads/qb-banking.zip"
+    },
+    {
+      "id": 5,
+      "title": "Advanced Vehicle Shop System",
+      "description": "",
+      "shortDescription": "",
+      "price": 0,
+      "images": [
+        "assets/image/vehicle_shop1.jpg",
+        "assets/image/vehicle_shop2.jpg",
+        "assets/image/vehicle_shop3.jpg"
+      ],
+      "categories": ["QB-Core", "ESX"],
+      "fullDescription": "This is an Modern advance vehicle shop system",
+      "installation": "1. Download and extract  \n2. Add to resources folder \n3. ensure resource in server.cfg\n4. Import the SQL file to create the required database tables",
+      "dependencies": ["QB-Core/ESX", "oxmysql/MySQL-Async"],
+      "downloadFile": "assets/downloads/real-vehicleshop.zip"
+    }
+  ],
+  "categories": ["ESX", "QB-Core", "QBox"],
+  "team": [
+    {
+      "name": "John Doe",
+      "role": "Lead Developer",
+      "avatar": "team1.jpg"
+    },
+    {
+      "name": "Jane Smith",
+      "role": "UI/UX Designer",
+      "avatar": "team2.jpg"
+    }
+  ],
+  "shopInfo": {
+    "location": "123 Gaming Street, Virtual City",
+    "phone": "+1 (555) 123-4567",
+    "email": "support@fivemstore.com"
+  }
+}

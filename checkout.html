@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FiveM Store - Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation (same as index.html) -->
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-blue-400">FiveM Store</h1>
+          </div>
+          <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+            <a href="products.html" class="hover:text-blue-400 transition"
+              >Products</a
+            >
+            <a href="categories.html" class="hover:text-blue-400 transition"
+              >Categories</a
+            >
+            <a href="about.html" class="hover:text-blue-400 transition"
+              >About</a
+            >
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-40 md:w-64"
+              />
+              <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+            <a
+              href="checkout.html"
+              class="relative p-2 text-blue-400 transition"
+            >
+              <i class="fas fa-shopping-cart text-xl"></i>
+              <span
+                id="cartCount"
+                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hidden"
+                >0</span
+              >
+            </a>
+            <button
+              id="themeToggle"
+              onclick="toggleTheme()"
+              class="p-2 hover:text-blue-400 transition"
+            >
+              <i class="fas fa-moon"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="md:hidden flex justify-center space-x-6 py-3 border-t border-gray-700"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="products.html" class="hover:text-blue-400 transition"
+            >Products</a
+          >
+          <a href="categories.html" class="hover:text-blue-400 transition"
+            >Categories</a
+          >
+          <a href="about.html" class="hover:text-blue-400 transition">About</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2">
+          <div id="cartItems" class="bg-gray-800 rounded-lg p-6">
+            <!-- Cart items will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+          <div class="bg-gray-800 rounded-lg p-6 sticky top-4">
+            <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
+
+            <div class="space-y-2 mb-4">
+              <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span id="subtotal">$0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Tax:</span>
+                <span id="tax">$0.00</span>
+              </div>
+              <div
+                class="flex justify-between text-lg font-semibold border-t border-gray-700 pt-2"
+              >
+                <span>Total:</span>
+                <span id="total">$0.00</span>
+              </div>
+            </div>
+
+            <button
+              id="checkoutButton"
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed"
+            >
+              Proceed to Checkout
+            </button>
+
+            <div id="freeDownloadSection" class="hidden mt-4">
+              <button
+                onclick="processFreeCheckout()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition font-semibold"
+              >
+                Download Free Products
+              </button>
+            </div>
+
+            <!-- Download Links Section -->
+            <div id="downloadLinks" class="hidden mt-4">
+              <h4 class="font-semibold mb-2">Your Downloads:</h4>
+              <div id="downloadLinksList" class="space-y-2">
+                <!-- Download links will appear here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      function renderCart() {
+        const cart = getCart();
+        const cartItems = document.getElementById("cartItems");
+        const subtotalElement = document.getElementById("subtotal");
+        const taxElement = document.getElementById("tax");
+        const totalElement = document.getElementById("total");
+        const checkoutButton = document.getElementById("checkoutButton");
+        const freeDownloadSection = document.getElementById(
+          "freeDownloadSection"
+        );
+        const downloadLinks = document.getElementById("downloadLinks");
+
+        if (cart.length === 0) {
+          cartItems.innerHTML = `
+            <div class="text-center py-8">
+              <i class="fas fa-shopping-cart text-4xl text-gray-400 mb-4"></i>
+              <p class="text-gray-400">Your cart is empty</p>
+              <a href="products.html" class="text-blue-400 hover:text-blue-300 mt-2 inline-block">
+                Continue Shopping
+              </a>
+            </div>
+          `;
+          subtotalElement.textContent = "$0.00";
+          taxElement.textContent = "$0.00";
+          totalElement.textContent = "$0.00";
+          checkoutButton.disabled = true;
+          freeDownloadSection.classList.add("hidden");
+          downloadLinks.classList.add("hidden");
+          return;
+        }
+
+        // Calculate totals
+        const subtotal = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        const tax = subtotal * 0.1; // 10% tax
+        const total = subtotal + tax;
+
+        // Update totals
+        subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+        taxElement.textContent = `$${tax.toFixed(2)}`;
+        totalElement.textContent = `$${total.toFixed(2)}`;
+
+        // Show/hide free download section
+        const hasFreeProducts = cart.some((item) => item.price === 0);
+        const hasPaidProducts = cart.some((item) => item.price > 0);
+
+        if (hasFreeProducts && !hasPaidProducts) {
+          freeDownloadSection.classList.remove("hidden");
+          checkoutButton.disabled = true;
+        } else {
+          freeDownloadSection.classList.add("hidden");
+          checkoutButton.disabled = false;
+        }
+
+        // Render cart items
+        cartItems.innerHTML = cart
+          .map(
+            (item) => `
+              <div class="flex items-center justify-between py-4 border-b border-gray-700 last:border-b-0">
+                <div class="flex items-center space-x-4">
+                  <div class="w-16 h-16 bg-gray-700 rounded flex items-center justify-center">
+                    <i class="fas fa-box text-gray-400"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">${item.title}</h4>
+                    <p class="text-gray-400 text-sm">${
+                      item.shortDescription
+                    }</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                      <span class="text-green-400 font-semibold">
+                        ${item.price === 0 ? "FREE" : `$${item.price}`}
+                      </span>
+                      <span class="text-gray-400">× ${item.quantity}</span>
+                    </div>
+                    ${
+                      item.downloadFile
+                        ? `
+                    <div class="mt-2">
+                      <button onclick="downloadProduct('${item.downloadFile}', '${item.title}')" 
+                              class="text-blue-400 hover:text-blue-300 text-sm flex items-center">
+                        <i class="fas fa-download mr-1"></i>
+                        Download File
+                      </button>
+                    </div>
+                    `
+                        : ""
+                    }
+                  </div>
+                </div>
+                <button onclick="removeFromCart(${item.id})" 
+                        class="text-red-400 hover:text-red-300 transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      function downloadProduct(filePath, productName) {
+        showNotification(`Starting download: ${productName}`);
+
+        // Create a temporary download link
+        const link = document.createElement("a");
+        link.href = filePath;
+        link.download = `${productName.replace(/\s+/g, "-").toLowerCase()}.zip`;
+        link.target = "_blank";
+
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Show success message after a short delay
+        setTimeout(() => {
+          showNotification(`${productName} download started!`);
+        }, 1000);
+      }
+
+      function processFreeCheckout() {
+        const cart = getCart();
+        const freeProducts = cart.filter((item) => item.price === 0);
+
+        if (freeProducts.length === 0) {
+          showNotification("No free products in cart", "error");
+          return;
+        }
+
+        // Download all free products
+        freeProducts.forEach((product) => {
+          if (product.downloadFile) {
+            downloadProduct(product.downloadFile, product.title);
+          } else {
+            showNotification(
+              `No download file available for ${product.title}`,
+              "error"
+            );
+          }
+        });
+
+        // Show download links section
+        const downloadLinks = document.getElementById("downloadLinks");
+        const downloadLinksList = document.getElementById("downloadLinksList");
+
+        downloadLinksList.innerHTML = freeProducts
+          .filter((product) => product.downloadFile)
+          .map(
+            (product) => `
+            <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
+              <span class="text-sm">${product.title}</span>
+              <button onclick="downloadProduct('${product.downloadFile}', '${product.title}')" 
+                      class="text-blue-400 hover:text-blue-300 text-sm">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          `
+          )
+          .join("");
+
+        downloadLinks.classList.remove("hidden");
+
+        // Remove free products from cart after download
+        setTimeout(() => {
+          freeProducts.forEach((item) => {
+            removeFromCart(item.id);
+          });
+          showNotification("Free products processed successfully!");
+        }, 2000);
+      }
+
+      function processCheckout() {
+        const cart = getCart();
+        const paidProducts = cart.filter((item) => item.price > 0);
+
+        if (paidProducts.length === 0) {
+          showNotification("No paid products in cart", "error");
+          return;
+        }
+
+        // Create message for Telegram
+        const message = paidProducts
+          .map(
+            (item) =>
+              `Product: ${item.title}\nPrice: $${item.price}\nQuantity: ${
+                item.quantity
+              }\nSubtotal: $${(item.price * item.quantity).toFixed(2)}`
+          )
+          .join("\n\n");
+
+        const total = paidProducts.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        const finalMessage = `${message}\n\nTotal: $${total.toFixed(2)}`;
+
+        const encodedMessage = encodeURIComponent(finalMessage);
+        window.open(`https://t.me/heanghg799?text=${encodedMessage}`, "_blank");
+
+        showNotification("Redirecting to Telegram for payment...");
+
+        // Store purchase info for later download access
+        storePurchase(paidProducts);
+      }
+
+      function storePurchase(products) {
+        const purchases = JSON.parse(localStorage.getItem("purchases")) || [];
+        const purchase = {
+          id: Date.now(),
+          products: products,
+          total: products.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          ),
+          date: new Date().toISOString(),
+          status: "pending",
+        };
+        purchases.push(purchase);
+        localStorage.setItem("purchases", JSON.stringify(purchases));
+      }
+
+      // Initialize theme and cart
+      document.addEventListener("DOMContentLoaded", () => {
+        // Initialize theme
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.className = savedTheme;
+        updateThemeToggleIcon(savedTheme);
+
+        renderCart();
+
+        document
+          .getElementById("checkoutButton")
+          .addEventListener("click", processCheckout);
+      });
+
+      // Theme functions
+      function toggleTheme() {
+        const currentTheme = document.documentElement.classList.contains("dark")
+          ? "dark"
+          : "light";
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        document.documentElement.classList.remove("dark", "light");
+        document.documentElement.classList.add(newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateThemeToggleIcon(newTheme);
+      }
+
+      function updateThemeToggleIcon(theme) {
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.innerHTML =
+            theme === "dark"
+              ? '<i class="fas fa-sun"></i>'
+              : '<i class="fas fa-moon"></i>';
+        }
+      }
+    </script>
+  </body>
+</html>
