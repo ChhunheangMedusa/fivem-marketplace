@@ -5,10 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FiveM Store - Checkout</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="styles.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @media print {
+        nav,
+        button,
+        #checkoutSection {
+          display: none !important;
+        }
+        #orderConfirmationSection {
+          display: block !important;
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
   <body class="bg-gray-900 text-white min-h-screen">
-    <!-- Navigation (same as index.html) -->
+    <!-- Navigation -->
     <nav class="bg-gray-800 shadow-lg">
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
@@ -72,68 +102,309 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+      <!-- Checkout Section -->
+      <div id="checkoutSection">
+        <h1 class="text-3xl font-bold mb-8">Checkout</h1>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Cart Items -->
-        <div class="lg:col-span-2">
-          <div id="cartItems" class="bg-gray-800 rounded-lg p-6">
-            <!-- Cart items will be loaded here -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Cart Items -->
+          <div class="lg:col-span-2">
+            <div id="cartItems" class="bg-gray-800 rounded-lg p-6">
+              <!-- Cart items will be loaded here -->
+            </div>
           </div>
-        </div>
 
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-gray-800 rounded-lg p-6 sticky top-4">
-            <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
+          <!-- Order Summary -->
+          <div class="lg:col-span-1">
+            <div class="bg-gray-800 rounded-lg p-6 sticky top-4">
+              <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
 
-            <div class="space-y-2 mb-4">
-              <div class="flex justify-between">
-                <span>Subtotal:</span>
-                <span id="subtotal">$0.00</span>
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span id="subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Tax:</span>
+                  <span id="tax">$0.00</span>
+                </div>
+                <div
+                  class="flex justify-between text-lg font-semibold border-t border-gray-700 pt-2"
+                >
+                  <span>Total:</span>
+                  <span id="total">$0.00</span>
+                </div>
               </div>
-              <div class="flex justify-between">
-                <span>Tax:</span>
-                <span id="tax">$0.00</span>
-              </div>
-              <div
-                class="flex justify-between text-lg font-semibold border-t border-gray-700 pt-2"
-              >
-                <span>Total:</span>
-                <span id="total">$0.00</span>
-              </div>
-            </div>
 
-            <button
-              id="checkoutButton"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed"
-            >
-              Proceed to Checkout
-            </button>
-
-            <div id="freeDownloadSection" class="hidden mt-4">
               <button
-                onclick="processFreeCheckout()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition font-semibold"
+                id="checkoutButton"
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed"
               >
-                Download Free Products
+                Order via Telegram
               </button>
-            </div>
 
-            <!-- Download Links Section -->
-            <div id="downloadLinks" class="hidden mt-4">
-              <h4 class="font-semibold mb-2">Your Downloads:</h4>
-              <div id="downloadLinksList" class="space-y-2">
-                <!-- Download links will appear here -->
+              <div id="freeDownloadSection" class="hidden mt-4">
+                <button
+                  onclick="processFreeCheckout()"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition font-semibold"
+                >
+                  Download All Free Products
+                </button>
+              </div>
+
+              <!-- Order Preview -->
+              <div
+                id="orderPreview"
+                class="hidden mt-4 p-4 bg-gray-700 rounded-lg"
+              >
+                <h4 class="font-semibold mb-2">📦 Order Includes:</h4>
+                <div id="orderPreviewList" class="text-sm space-y-1">
+                  <!-- Order preview will be loaded here -->
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Order Confirmation Section -->
+      <div id="orderConfirmationSection" class="hidden fade-in">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-4xl mx-auto">
+          <div class="text-center mb-8">
+            <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+            <h1 class="text-3xl font-bold">Order Confirmed!</h1>
+            <p class="text-gray-400 mt-2">
+              Your order has been successfully placed
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Order Details -->
+            <div class="bg-gray-700 rounded-lg p-6">
+              <h2 class="text-xl font-semibold mb-4">🧾 ORDER CONFIRMATION</h2>
+
+              <div class="space-y-4">
+                <div>
+                  <p class="text-gray-400">Invoice No.</p>
+                  <p class="font-semibold" id="invoiceNumber">INV-2025-001</p>
+                </div>
+
+                <div>
+                  <p class="text-gray-400">Date Issued</p>
+                  <p class="font-semibold" id="invoiceDate">October 18, 2025</p>
+                </div>
+
+                <div>
+                  <p class="text-gray-400">Payment Status</p>
+                  <p class="font-semibold text-yellow-400" id="paymentStatus">
+                    Pending
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-gray-400">Client Name</p>
+                  <p class="font-semibold" id="clientName">[Customer Name]</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="bg-gray-700 rounded-lg p-6">
+              <h2 class="text-xl font-semibold mb-4">💰 ORDER SUMMARY</h2>
+
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span>Total Items:</span>
+                  <span id="confirmationItems">1</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span id="confirmationSubtotal">$10.00</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Tax (10%):</span>
+                  <span id="confirmationTax">$1.00</span>
+                </div>
+                <div
+                  class="flex justify-between text-lg font-semibold border-t border-gray-600 pt-2"
+                >
+                  <span>Total Amount Due:</span>
+                  <span id="confirmationTotal">$11.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Details -->
+          <div class="bg-gray-700 rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">📦 PRODUCT DETAILS</h2>
+            <div id="productDetailsList">
+              <!-- Product details will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Payment & Delivery Process -->
+          <div class="bg-gray-700 rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">
+              🪙 PAYMENT & DELIVERY PROCESS
+            </h2>
+            <div class="space-y-3">
+              <p>A QR code for payment will be provided shortly.</p>
+              <p>Please complete the payment using the provided method.</p>
+              <p>
+                Once payment is confirmed, don't forget to send the invoice.
+              </p>
+              <p>
+                You will then receive a torrent download link for your product.
+              </p>
+              <p>Download, install, and enjoy your new script.</p>
+              <p class="mt-4">
+                Thank you for your order and for choosing our services.
+              </p>
+            </div>
+          </div>
+
+          <!-- Telegram Integration -->
+          <div class="bg-gray-700 rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">
+              📱 TELEGRAM ORDER CONFIRMATION
+            </h2>
+            <div class="space-y-4">
+              <p class="text-gray-300">
+                Your order details are being sent to our Telegram bot
+                automatically.
+              </p>
+
+              <div id="telegramStatus" class="flex items-center space-x-3">
+                <div
+                  id="telegramLoading"
+                  class="flex items-center space-x-2 text-blue-400"
+                >
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Sending order to Telegram...</span>
+                </div>
+                <div
+                  id="telegramSuccess"
+                  class="hidden items-center space-x-2 text-green-400"
+                >
+                  <i class="fas fa-check-circle"></i>
+                  <span>Order sent to Telegram successfully!</span>
+                </div>
+                <div
+                  id="telegramError"
+                  class="hidden items-center space-x-2 text-red-400"
+                >
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>Failed to send to Telegram. Please try manually.</span>
+                </div>
+              </div>
+
+              <div
+                id="telegramAutoRedirect"
+                class="hidden bg-blue-900/30 border border-blue-700 rounded-lg p-4 mt-4"
+              >
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-external-link-alt text-blue-400 text-xl"></i>
+                  <div>
+                    <p class="font-semibold">Opening Telegram...</p>
+                    <p class="text-sm text-gray-300">
+                      You will be redirected to Telegram automatically in
+                      <span id="countdown">3</span> seconds
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                <button
+                  id="openTelegramBtn"
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center"
+                >
+                  <i class="fab fa-telegram mr-2"></i>
+                  Open Telegram Now
+                </button>
+                <button
+                  id="copyMessageBtn"
+                  class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center"
+                >
+                  <i class="fas fa-copy mr-2"></i>
+                  Copy Order Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button
+              onclick="printInvoice()"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center"
+            >
+              <i class="fas fa-print mr-2"></i>
+              Print Invoice
+            </button>
+            <button
+              onclick="continueShopping()"
+              class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center"
+            >
+              <i class="fas fa-shopping-cart mr-2"></i>
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
 
-    <script src="script.js"></script>
     <script>
+      // Telegram configuration
+      const TELEGRAM_BOT_USERNAME = "heanghg799";
+      let telegramUrl = "";
+      let countdownInterval = null;
+
+      // Cart management functions
+      function getCart() {
+        const cart = localStorage.getItem("cart");
+        return cart ? JSON.parse(cart) : [];
+      }
+
+      function removeFromCart(productId) {
+        let cart = getCart();
+        cart = cart.filter((item) => item.id !== productId);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+        updateCartCount();
+      }
+
+      function updateCartCount() {
+        const cart = getCart();
+        const cartCount = document.getElementById("cartCount");
+        if (cartCount) {
+          if (cart.length > 0) {
+            cartCount.textContent = cart.length;
+            cartCount.classList.remove("hidden");
+          } else {
+            cartCount.classList.add("hidden");
+          }
+        }
+      }
+
+      function showNotification(message, type = "success") {
+        // Create notification element
+        const notification = document.createElement("div");
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+          type === "error" ? "bg-red-600" : "bg-green-600"
+        } text-white`;
+        notification.textContent = message;
+
+        // Add to page
+        document.body.appendChild(notification);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 3000);
+      }
+
       function renderCart() {
         const cart = getCart();
         const cartItems = document.getElementById("cartItems");
@@ -144,7 +415,8 @@
         const freeDownloadSection = document.getElementById(
           "freeDownloadSection"
         );
-        const downloadLinks = document.getElementById("downloadLinks");
+        const orderPreview = document.getElementById("orderPreview");
+        const orderPreviewList = document.getElementById("orderPreviewList");
 
         if (cart.length === 0) {
           cartItems.innerHTML = `
@@ -161,7 +433,7 @@
           totalElement.textContent = "$0.00";
           checkoutButton.disabled = true;
           freeDownloadSection.classList.add("hidden");
-          downloadLinks.classList.add("hidden");
+          orderPreview.classList.add("hidden");
           return;
         }
 
@@ -170,7 +442,7 @@
           (sum, item) => sum + item.price * item.quantity,
           0
         );
-        const tax = subtotal * 0.1; // 10% tax
+        const tax = subtotal * 0.1;
         const total = subtotal + tax;
 
         // Update totals
@@ -185,9 +457,11 @@
         if (hasFreeProducts && !hasPaidProducts) {
           freeDownloadSection.classList.remove("hidden");
           checkoutButton.disabled = true;
+          orderPreview.classList.add("hidden");
         } else {
           freeDownloadSection.classList.add("hidden");
           checkoutButton.disabled = false;
+          orderPreview.classList.remove("hidden");
         }
 
         // Render cart items
@@ -197,27 +471,46 @@
               <div class="flex items-center justify-between py-4 border-b border-gray-700 last:border-b-0">
                 <div class="flex items-center space-x-4">
                   <div class="w-16 h-16 bg-gray-700 rounded flex items-center justify-center">
-                    <i class="fas fa-box text-gray-400"></i>
+                    ${
+                      item.images && item.images.length > 0
+                        ? `<img src="${item.images[0]}" alt="${item.title}" class="w-full h-full object-cover rounded" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <div class="w-full h-full flex items-center justify-center" style="display: none;">
+                         <i class="fas fa-box text-gray-400"></i>
+                       </div>`
+                        : `<i class="fas fa-box text-gray-400"></i>`
+                    }
                   </div>
-                  <div>
+                  <div class="flex-1">
                     <h4 class="font-semibold">${item.title}</h4>
                     <p class="text-gray-400 text-sm">${
-                      item.shortDescription
+                      item.shortDescription ||
+                      item.description ||
+                      "No description available"
                     }</p>
                     <div class="flex items-center space-x-2 mt-1">
                       <span class="text-green-400 font-semibold">
-                        ${item.price === 0 ? "FREE" : `$${item.price}`}
+                        ${
+                          item.price === 0
+                            ? "FREE"
+                            : `$${item.price.toFixed(2)}`
+                        }
                       </span>
                       <span class="text-gray-400">× ${item.quantity}</span>
                     </div>
+                    <div class="flex items-center space-x-2 mt-1 text-xs text-gray-400">
+                      <span>🖼️ ${item.images?.length || 0} images</span>
+                      <span>🔧 ${
+                        item.categories?.join(", ") || "No categories"
+                      }</span>
+                    </div>
                     ${
-                      item.downloadFile
+                      item.torrentFile && item.price === 0
                         ? `
                     <div class="mt-2">
-                      <button onclick="downloadProduct('${item.downloadFile}', '${item.title}')" 
-                              class="text-blue-400 hover:text-blue-300 text-sm flex items-center">
-                        <i class="fas fa-download mr-1"></i>
-                        Download File
+                      <button onclick="downloadProduct('${item.torrentFile}', '${item.title}')" 
+                              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition flex items-center">
+                        <i class="fas fa-magnet mr-2"></i>
+                        Download Torrent
                       </button>
                     </div>
                     `
@@ -226,32 +519,47 @@
                   </div>
                 </div>
                 <button onclick="removeFromCart(${item.id})" 
-                        class="text-red-400 hover:text-red-300 transition">
+                        class="text-red-400 hover:text-red-300 transition ml-4">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
             `
           )
           .join("");
+
+        // Update order preview
+        if (hasPaidProducts) {
+          const paidItems = cart.filter((item) => item.price > 0);
+          orderPreviewList.innerHTML = paidItems
+            .map(
+              (item) => `
+            <div class="flex justify-between items-center py-1">
+              <span class="truncate">${item.title}</span>
+              <span class="text-green-400">$${item.price.toFixed(2)}</span>
+            </div>
+            <div class="text-xs text-gray-400 flex justify-between">
+              <span>${item.images?.length || 0} images</span>
+              <span>Qty: ${item.quantity}</span>
+            </div>
+          `
+            )
+            .join("");
+        }
       }
 
       function downloadProduct(filePath, productName) {
-        showNotification(`Starting download: ${productName}`);
-
-        // Create a temporary download link
+        showNotification(`Starting torrent download: ${productName}`);
         const link = document.createElement("a");
         link.href = filePath;
-        link.download = `${productName.replace(/\s+/g, "-").toLowerCase()}.zip`;
+        link.download = `${productName
+          .replace(/\s+/g, "-")
+          .toLowerCase()}.torrent`;
         link.target = "_blank";
-
-        // Append to body, click, and remove
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
-        // Show success message after a short delay
         setTimeout(() => {
-          showNotification(`${productName} download started!`);
+          showNotification(`${productName} torrent download started!`);
         }, 1000);
       }
 
@@ -264,45 +572,22 @@
           return;
         }
 
-        // Download all free products
         freeProducts.forEach((product) => {
-          if (product.downloadFile) {
-            downloadProduct(product.downloadFile, product.title);
+          if (product.torrentFile) {
+            downloadProduct(product.torrentFile, product.title);
           } else {
             showNotification(
-              `No download file available for ${product.title}`,
+              `No torrent file available for ${product.title}`,
               "error"
             );
           }
         });
 
-        // Show download links section
-        const downloadLinks = document.getElementById("downloadLinks");
-        const downloadLinksList = document.getElementById("downloadLinksList");
-
-        downloadLinksList.innerHTML = freeProducts
-          .filter((product) => product.downloadFile)
-          .map(
-            (product) => `
-            <div class="flex justify-between items-center p-2 bg-gray-700 rounded">
-              <span class="text-sm">${product.title}</span>
-              <button onclick="downloadProduct('${product.downloadFile}', '${product.title}')" 
-                      class="text-blue-400 hover:text-blue-300 text-sm">
-                <i class="fas fa-download"></i>
-              </button>
-            </div>
-          `
-          )
-          .join("");
-
-        downloadLinks.classList.remove("hidden");
-
-        // Remove free products from cart after download
         setTimeout(() => {
           freeProducts.forEach((item) => {
             removeFromCart(item.id);
           });
-          showNotification("Free products processed successfully!");
+          showNotification("Free products downloaded successfully!");
         }, 2000);
       }
 
@@ -315,68 +600,257 @@
           return;
         }
 
-        // Create message for Telegram
-        const message = paidProducts
-          .map(
-            (item) =>
-              `Product: ${item.title}\nPrice: $${item.price}\nQuantity: ${
-                item.quantity
-              }\nSubtotal: $${(item.price * item.quantity).toFixed(2)}`
-          )
-          .join("\n\n");
+        // Show order confirmation
+        showOrderConfirmation(paidProducts);
 
-        const total = paidProducts.reduce(
+        // Send to Telegram automatically
+        sendToTelegram(paidProducts);
+      }
+
+      function showOrderConfirmation(products) {
+        // Hide checkout section, show confirmation section
+        document.getElementById("checkoutSection").classList.add("hidden");
+        document
+          .getElementById("orderConfirmationSection")
+          .classList.remove("hidden");
+
+        // Calculate totals
+        const subtotal = products.reduce(
           (sum, item) => sum + item.price * item.quantity,
           0
         );
-        const finalMessage = `${message}\n\nTotal: $${total.toFixed(2)}`;
+        const tax = subtotal * 0.1;
+        const total = subtotal + tax;
 
-        const encodedMessage = encodeURIComponent(finalMessage);
-        window.open(`https://t.me/heanghg799?text=${encodedMessage}`, "_blank");
+        // Update confirmation details
+        document.getElementById("confirmationItems").textContent =
+          products.length;
+        document.getElementById(
+          "confirmationSubtotal"
+        ).textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById(
+          "confirmationTax"
+        ).textContent = `$${tax.toFixed(2)}`;
+        document.getElementById(
+          "confirmationTotal"
+        ).textContent = `$${total.toFixed(2)}`;
 
-        showNotification("Redirecting to Telegram for payment...");
+        // Generate product details from actual cart data
+        const productDetailsList =
+          document.getElementById("productDetailsList");
+        productDetailsList.innerHTML = products
+          .map(
+            (product, index) => `
+          <div class="mb-6 ${
+            index < products.length - 1 ? "border-b border-gray-600 pb-4" : ""
+          }">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-semibold">${product.title}</h3>
+              <span class="text-green-400">$${product.price.toFixed(2)} × ${
+              product.quantity
+            } = $${(product.price * product.quantity).toFixed(2)}</span>
+            </div>
+            <p class="text-gray-400 mb-2">${
+              product.description ||
+              product.shortDescription ||
+              "No description available"
+            }</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <div><span class="text-gray-400">Categories:</span> ${
+                product.categories?.join(", ") || "N/A"
+              }</div>
+              <div><span class="text-gray-400">Dependencies:</span> ${
+                product.dependencies?.join(", ") || "None"
+              }</div>
+            </div>
+            ${
+              product.images && product.images.length > 0
+                ? `
+            <div class="mt-2">
+              <span class="text-gray-400">Images:</span> ${product.images.length} screenshots available
+            </div>
+            `
+                : ""
+            }
+          </div>
+        `
+          )
+          .join("");
 
-        // Store purchase info for later download access
-        storePurchase(paidProducts);
+        // Generate invoice number with current date
+        const now = new Date();
+        const invoiceNumber = `INV-${now.getFullYear()}-${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}${String(now.getDate()).padStart(
+          2,
+          "0"
+        )}-${Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, "0")}`;
+        document.getElementById("invoiceNumber").textContent = invoiceNumber;
+
+        // Format date
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        document.getElementById("invoiceDate").textContent =
+          now.toLocaleDateString("en-US", options);
+
+        // Store order in localStorage for persistence
+        storeOrder(products, invoiceNumber, total);
       }
 
-      function storePurchase(products) {
-        const purchases = JSON.parse(localStorage.getItem("purchases")) || [];
-        const purchase = {
-          id: Date.now(),
+      function storeOrder(products, invoiceNumber, total) {
+        const orders = JSON.parse(localStorage.getItem("orders")) || [];
+        const order = {
+          id: invoiceNumber,
           products: products,
-          total: products.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-          ),
+          total: total,
           date: new Date().toISOString(),
           status: "pending",
         };
-        purchases.push(purchase);
-        localStorage.setItem("purchases", JSON.stringify(purchases));
+        orders.push(order);
+        localStorage.setItem("orders", JSON.stringify(orders));
       }
 
-      // Initialize theme and cart
-      document.addEventListener("DOMContentLoaded", () => {
-        // Initialize theme
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        document.documentElement.className = savedTheme;
-        updateThemeToggleIcon(savedTheme);
+      function sendToTelegram(products) {
+        // Show loading state
+        document.getElementById("telegramLoading").classList.remove("hidden");
+        document.getElementById("telegramSuccess").classList.add("hidden");
+        document.getElementById("telegramError").classList.add("hidden");
+        document.getElementById("telegramAutoRedirect").classList.add("hidden");
 
-        renderCart();
+        // Create Telegram message
+        const message = createTelegramMessage(products);
 
+        // Encode message for URL
+        const encodedMessage = encodeURIComponent(message);
+
+        // Create Telegram URL
+        telegramUrl = `https://t.me/${TELEGRAM_BOT_USERNAME}?text=${encodedMessage}`;
+
+        // Set up Telegram button
+        document.getElementById("openTelegramBtn").onclick = function () {
+          clearInterval(countdownInterval);
+          openTelegram();
+        };
+
+        // Set up copy button
+        document.getElementById("copyMessageBtn").onclick = function () {
+          navigator.clipboard.writeText(message).then(() => {
+            showNotification("Order details copied to clipboard!");
+          });
+        };
+
+        // Simulate sending to Telegram
+        setTimeout(() => {
+          document.getElementById("telegramLoading").classList.add("hidden");
+          document.getElementById("telegramSuccess").classList.remove("hidden");
+          showNotification("Order details sent to Telegram!");
+
+          // Start auto-redirect countdown
+          startAutoRedirect();
+        }, 1500);
+      }
+
+      function startAutoRedirect() {
         document
-          .getElementById("checkoutButton")
-          .addEventListener("click", processCheckout);
-      });
+          .getElementById("telegramAutoRedirect")
+          .classList.remove("hidden");
 
-      // Theme functions
+        let countdown = 3;
+        const countdownElement = document.getElementById("countdown");
+        countdownElement.textContent = countdown;
+
+        countdownInterval = setInterval(() => {
+          countdown--;
+          countdownElement.textContent = countdown;
+
+          if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            openTelegram();
+          }
+        }, 1000);
+      }
+
+      function openTelegram() {
+        // Clear any existing countdown
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+        }
+
+        // Open Telegram in a new tab
+        window.open(telegramUrl, "_blank");
+        showNotification("Opening Telegram with your order details...");
+
+        // Clear cart after successful order
+        setTimeout(() => {
+          localStorage.setItem("cart", JSON.stringify([]));
+          updateCartCount();
+        }, 1000);
+      }
+
+      function createTelegramMessage(products) {
+        let message = `🛒 *ORDER REQUEST - ${products.length} PRODUCT(S)*\n\n`;
+
+        let total = 0;
+
+        products.forEach((product, index) => {
+          const productTotal = product.price * product.quantity;
+          total += productTotal;
+
+          message += `*📦 PRODUCT ${index + 1}*\n`;
+          message += `┌────────────────────────\n`;
+          message += `│ 🏷️ *Title:* ${product.title}\n`;
+          message += `│ 💰 *Price:* $${product.price.toFixed(2)} x ${
+            product.quantity
+          } = $${productTotal.toFixed(2)}\n`;
+          message += `│ 📝 *Description:* ${
+            product.description || product.shortDescription || "No description"
+          }\n`;
+          message += `│ 🔧 *Categories:* ${
+            product.categories?.join(", ") || "N/A"
+          }\n`;
+          message += `│ ⚙️ *Dependencies:* ${
+            product.dependencies?.join(", ") || "None"
+          }\n`;
+          message += `└────────────────────────\n\n`;
+        });
+
+        const tax = total * 0.1;
+        const finalTotal = total + tax;
+
+        message += `*💰 ORDER SUMMARY*\n`;
+        message += `┌────────────────────────\n`;
+        message += `│ 📦 Total Items: ${products.length}\n`;
+        message += `│ 💵 Subtotal: $${total.toFixed(2)}\n`;
+        message += `│ 🧾 Tax (10%): $${tax.toFixed(2)}\n`;
+        message += `│ 💳 *TOTAL: $${finalTotal.toFixed(2)}*\n`;
+        message += `└────────────────────────\n\n`;
+
+        message += `*🔄 ORDER PROCESS:*\n`;
+        message += `1. We will provide QR Code payment in shortly\n`;
+        message += `2. Make payment\n`;
+        message += `3. Provide Invoice of your payment\n`;
+        message += `4. Provide link to download\n`;
+        message += `5. You download and enjoy! 🎮\n\n`;
+
+        return message;
+      }
+
+      function printInvoice() {
+        window.print();
+      }
+
+      function continueShopping() {
+        // Clear cart and redirect to products page
+        localStorage.setItem("cart", JSON.stringify([]));
+        window.location.href = "products.html";
+      }
+
       function toggleTheme() {
         const currentTheme = document.documentElement.classList.contains("dark")
           ? "dark"
           : "light";
         const newTheme = currentTheme === "dark" ? "light" : "dark";
-
         document.documentElement.classList.remove("dark", "light");
         document.documentElement.classList.add(newTheme);
         localStorage.setItem("theme", newTheme);
@@ -392,6 +866,20 @@
               : '<i class="fas fa-moon"></i>';
         }
       }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.className = savedTheme;
+        updateThemeToggleIcon(savedTheme);
+
+        renderCart();
+        updateCartCount();
+
+        document
+          .getElementById("checkoutButton")
+          .addEventListener("click", processCheckout);
+      });
     </script>
   </body>
 </html>

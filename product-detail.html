@@ -129,10 +129,210 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="telegram-bot.js"></script>
     <script>
       let currentProduct = null;
       let currentImageIndex = 0;
 
+      // Notification function
+      function showNotification(message, type = "success") {
+        // Create notification element
+        const notification = document.createElement("div");
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+          type === "error" ? "bg-red-600" : "bg-green-600"
+        } text-white`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Theme functions
+      function toggleTheme() {
+        const currentTheme = document.documentElement.classList.contains("dark")
+          ? "dark"
+          : "light";
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.classList.remove("dark", "light");
+        document.documentElement.classList.add(newTheme);
+        localStorage.setItem("theme", newTheme);
+        updateThemeToggleIcon(newTheme);
+      }
+
+      function updateThemeToggleIcon(theme) {
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.innerHTML =
+            theme === "dark"
+              ? '<i class="fas fa-sun"></i>'
+              : '<i class="fas fa-moon"></i>';
+        }
+      }
+
+      // Cart functions
+      function getCart() {
+        return JSON.parse(localStorage.getItem("cart")) || [];
+      }
+
+      function addToCart(product) {
+        const cart = getCart();
+        const existingItem = cart.find((item) => item.id === product.id);
+
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          cart.push({
+            ...product,
+            quantity: 1,
+          });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartCount();
+        showNotification(`${product.title} added to cart!`);
+      }
+
+      function updateCartCount() {
+        const cart = getCart();
+        const cartCount = document.getElementById("cartCount");
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+        if (cartCount) {
+          if (totalItems > 0) {
+            cartCount.textContent = totalItems;
+            cartCount.classList.remove("hidden");
+          } else {
+            cartCount.classList.add("hidden");
+          }
+        }
+      }
+
+      // Purchase functions
+      async function handlePurchase(product) {
+        if (!product) {
+          showNotification("Product not found", "error");
+          return;
+        }
+
+        try {
+          // Send product information first
+          const message = createProductTelegramMessage(product);
+          await telegramBot.sendMessage(message);
+
+          // Send images if available
+          if (product.images && product.images.length > 0) {
+            // Send first image with product title as caption
+            await telegramBot.sendPhoto(
+              product.images[0],
+              `📦 ${product.title}`
+            );
+
+            // Send remaining images as album
+            if (product.images.length > 1) {
+              const remainingPhotos = product.images.slice(1).map((url) => ({
+                url: url,
+                caption: "",
+              }));
+              await telegramBot.sendMediaGroup(remainingPhotos);
+            }
+          }
+
+          showNotification("Product details and images sent to Telegram!");
+
+          // Store purchase info
+          storeSinglePurchase(product);
+        } catch (error) {
+          console.error("Error sending to Telegram:", error);
+          // Fallback to manual method
+          fallbackToManualTelegram(product);
+        }
+      }
+      function fallbackToManualTelegram(product) {
+        const message = createProductTelegramMessage(product);
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://t.me/heanghg799?text=${encodedMessage}`, "_blank");
+        showNotification("Opening Telegram manually...");
+      }
+      function createProductTelegramMessage(product) {
+        let message = `🛒 *SINGLE PRODUCT ORDER REQUEST*\n\n`;
+
+        const productTotal = product.price;
+
+        message += `*📦 PRODUCT DETAILS*\n`;
+        message += `┌────────────────────────\n`;
+        message += `│ 🏷️ *Title:* ${product.title}\n`;
+        message += `│ 💰 *Price:* $${product.price}\n`;
+        message += `│ 📝 *Description:* ${
+          product.fullDescription || product.shortDescription
+        }\n`;
+        message += `│ 🔧 *Categories:* ${
+          product.categories?.join(", ") || "N/A"
+        }\n`;
+        message += `│ ⚙️ *Dependencies:* ${
+          product.dependencies?.join(", ") || "None"
+        }\n`;
+        message += `│ 🖼️ *Images:* ${
+          product.images?.length || 0
+        } screenshots\n`;
+
+        // Add image URLs in a more organized way
+        if (product.images && product.images.length > 0) {
+          message += `│ 📸 *SCREENSHOTS:*\n`;
+          product.images.forEach((image, imgIndex) => {
+            message += `│    👉 ${image}\n`;
+          });
+        }
+
+        message += `│ 🔗 *Torrent:* ${
+          product.torrentFile || "Provided after payment"
+        }\n`;
+        message += `└────────────────────────\n\n`;
+
+        const tax = productTotal * 0.1;
+        const finalTotal = productTotal + tax;
+
+        message += `*💰 ORDER SUMMARY*\n`;
+        message += `┌────────────────────────\n`;
+        message += `│ 📦 Items: 1\n`;
+        message += `│ 💵 Subtotal: $${productTotal.toFixed(2)}\n`;
+        message += `│ 🧾 Tax (10%): $${tax.toFixed(2)}\n`;
+        message += `│ 💳 *TOTAL: $${finalTotal.toFixed(2)}*\n`;
+        message += `└────────────────────────\n\n`;
+
+        message += `*📋 HOW TO VIEW PRODUCT IMAGES:*\n`;
+        message += `1. *Copy* the image URLs above (lines starting with 👉)\n`;
+        message += `2. *Paste each URL* in your browser to view screenshots\n`;
+        message += `3. Or send me the URLs and I'll share the images directly\n\n`;
+
+        message += `*🔄 ORDER PROCESS:*\n`;
+        message += `1. You review the product screenshots\n`;
+        message += `2. Make payment\n`;
+        message += `3. I provide torrent download links\n`;
+        message += `4. You download and enjoy! 🎮\n\n`;
+
+        message += `Please confirm you can access the image URLs above.`;
+
+        return message;
+      }
+
+      function storeSinglePurchase(product) {
+        const purchases = JSON.parse(localStorage.getItem("purchases")) || [];
+        const purchase = {
+          id: Date.now(),
+          products: [product],
+          total: product.price,
+          date: new Date().toISOString(),
+          status: "pending",
+        };
+        purchases.push(purchase);
+        localStorage.setItem("purchases", JSON.stringify(purchases));
+      }
+
+      // Product loading functions
       async function loadProductDetail() {
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get("id"));
@@ -244,7 +444,10 @@
                     <i class="fas fa-cart-plus mr-2"></i>
                     Add to Cart
                   </button>
+             
                 </div>
+                
+           
 
                 <!-- How to Install -->
                 <div class="mb-6">
@@ -366,7 +569,14 @@
         modal.classList.remove("hidden");
       }
 
-      document.addEventListener("DOMContentLoaded", loadProductDetail);
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.className = savedTheme;
+        updateThemeToggleIcon(savedTheme);
+        updateCartCount();
+        loadProductDetail();
+      });
     </script>
   </body>
 </html>
